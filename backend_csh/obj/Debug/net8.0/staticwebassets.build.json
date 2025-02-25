@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "2ZLeEkQW9QYi19vhs6f4ueyH8MvteY9QPCylw9v+f9E=",
+  "Source": "backend_csh",
+  "BasePath": "_content/backend_csh",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
