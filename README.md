@@ -45,6 +45,8 @@ npm run serve
 ### 📦 Бэкенд:
 ```bash
 cd Back
+python -m venv venv
+.\venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app
 or
