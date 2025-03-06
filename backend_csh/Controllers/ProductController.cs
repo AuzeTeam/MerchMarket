@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using backend_csh.Database;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend_csh.Controllers
 {
@@ -6,54 +9,68 @@ namespace backend_csh.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
+        private readonly AppDbContext _dbContext;
 
-        private static List<Product> pd = new List<Product>();
+        public ProductController(AppDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
 
         // GET: api/<ProductController>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IEnumerable<Product>> Get()
         {
-            return Ok(pd);
+            return await _dbContext.Products.ToListAsync();
         }
 
         // GET api/<ProductController>/5
         [HttpGet("{id}")]
-        public IEnumerable<Product> Get(long id)
+        public async Task<Product?> Get(Guid id)
         {
-            yield return pd.First(p => p.Id == id);
+            return await _dbContext.Products.FindAsync(id);
         }
 
         // POST api/<ProductController>
         [HttpPost]
-        public void Post([FromBody] Product value)
+        public async Task<Product> Post([FromBody] Product value)
         {
-            var newId = new Random().Next(1, 9999);
-            value.Id = newId;
-            pd.Add(value);
+            value.Id = new Guid();
+            _dbContext.Products.Add(value);
+            await _dbContext.SaveChangesAsync();
+            
+            return value;
         }
 
-        // PUT api/<ProductController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Product valueUpdate)
+        // PUT api/<ProductController>
+        [HttpPut]
+        public async Task<IActionResult> Put([FromBody] Product vProduct)
         {
-            if (valueUpdate.Id != id) BadRequest();
+            var existingProduct = await _dbContext.Products.FindAsync(vProduct.Id);
+    
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
 
-            var prod = pd.FirstOrDefault(p => p.Id == id);
+            _dbContext.Entry(existingProduct).CurrentValues.SetValues(vProduct);
 
-            if (prod == null) BadRequest();
-
-            prod.Name = valueUpdate.Name;
-            prod.Description = valueUpdate.Description;
-            prod.Price = valueUpdate.Price;
-
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         // DELETE api/<ProductController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("/{id}")]
+        public async Task Delete(Guid id)
         {
-            var prod = pd.FirstOrDefault(p => p.Id == id);
-            pd.Remove(prod);
+            await _dbContext.Products.Where(x => x.Id == id).ExecuteDeleteAsync();
+
         }
     }
 }
