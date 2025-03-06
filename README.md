@@ -19,6 +19,8 @@
 ```bash
 git clone https://github.com/danilbagesev472/Marketplace_CRM.git
 cd yourproject/Back
+python -m venv venv
+.\venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
