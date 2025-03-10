@@ -31,7 +31,7 @@ namespace backend.Controllers
         {
             if (_dbContext.Users.Any(n => n.Email == vUser.Email))
             {
-                return BadRequest(new {mass = "Пользователь с таким email уже существует" });
+                return BadRequest(new {mess = "Пользователь с таким email уже существует" });
             }
 
             var hashedPassword = HashPasswd(vUser.Passwd);
@@ -61,19 +61,21 @@ namespace backend.Controllers
 
             var userPasswd = HashPasswd(lUser.Passwd);
             user.RememberMe = rememberMe;
+            user.LogIn = true;
             await _dbContext.SaveChangesAsync();
             
-            return userPasswd == user.Passwd ? Ok(new { jwtlow = true, rem = rememberMe, mes ="success"}) : Ok(new {mes = "fail"});
+            return userPasswd == user.Passwd ? Ok(new { user.LogIn, rem = rememberMe, mess ="success"}) : Ok(new {mess = "fail"});
         }
 
         [HttpPost("logout")]
         public async Task<IActionResult> LogOut(User lUser)
         {
             var user = await _dbContext.Users.FirstAsync(u => u.Email == lUser.Email);
-            if (!user.RememberMe) return Ok(new { mes = "fail, your not auth" });
+            if (!user.RememberMe) return Ok(new { mess = "fail, your not auth" });
             user.RememberMe = false;
+            user.LogIn = false;
             await _dbContext.SaveChangesAsync();
-            return Ok(new{jwtlow = false, rem = false});
+            return Ok(new { user.LogIn, user.RememberMe });
 
         }
     }

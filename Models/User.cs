@@ -18,6 +18,9 @@ namespace backend.Models
 
         [Display(Name = "RememberMe")]
         public bool RememberMe { get; set; }
+
+        [Display(Name = "Login")]
+        public bool LogIn { get; set; }
 }
 
 }
